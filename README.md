@@ -1,4 +1,4 @@
-# EZ Piano
+# 🎹 EZ Piano 🎹
 
 A beautiful and feature-rich virtual piano with learning mode, multiple songs, and advanced sound options.
 
