@@ -2,6 +2,9 @@
 
 A beautiful and feature-rich virtual piano with learning mode, multiple songs, and advanced sound options.
 
+![image](https://github.com/user-attachments/assets/6ab3100a-6c99-4915-863b-c7b1e605509d)
+
+
 ## Features
 
 - **Multiple Sound Options**: Choose between Piano, Synth, and Organ sounds
