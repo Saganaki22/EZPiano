@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Songs Import</title>
+</head>
+<body>
+    <h1>Song Import Test</h1>
+    <p>Check the browser console to see if songs are loaded correctly.</p>
+    
+    <script type="module">
+        import songs from './songs.js';
+        
+        // Log the songs object to console
+        console.log('Songs object:', songs);
+        
+        // Check if specific songs are loaded
+        console.log('Fur Elise:', songs['fur-elise']);
+        console.log('Greensleeves:', songs['greensleeves']);
+        console.log('Happy Birthday:', songs['happy-birthday']);
+        
+        // Display on page
+        const resultDiv = document.createElement('div');
+        resultDiv.innerHTML = `
+            <h2>Results:</h2>
+            <p>Songs loaded: ${Object.keys(songs).length}</p>
+            <p>Songs available: ${Object.keys(songs).join(', ')}</p>
+        `;
+        document.body.appendChild(resultDiv);
+    </script>
+</body>
+</html> 
