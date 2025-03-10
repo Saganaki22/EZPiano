@@ -249,18 +249,25 @@
         .next-key-indicator {
             background-color: #ffcc00;
             display: block;
-            animation: breatheYellow 1.5s infinite;
+            animation: breatheYellow 0.8s infinite; /* Faster animation: reduced from 1.5s to 0.8s */
         }
 
         .correct-key-indicator {
             background-color: #22cc22;
             display: block;
             animation: none;
+            box-shadow: 0 0 12px 5px rgba(34, 204, 34, 0.8); /* Added stronger glow effect */
         }
 
         @keyframes breatheYellow {
-            0%, 100% { box-shadow: 0 0 5px 2px rgba(255, 204, 0, 0.4); transform: translateX(-50%) scale(1); }
-            50% { box-shadow: 0 0 10px 3px rgba(255, 204, 0, 0.7); transform: translateX(-50%) scale(1.2); }
+            0%, 100% { 
+                box-shadow: 0 0 8px 3px rgba(255, 204, 0, 0.6); 
+                transform: translateX(-50%) scale(1.1); 
+            }
+            50% { 
+                box-shadow: 0 0 15px 5px rgba(255, 204, 0, 0.9); 
+                transform: translateX(-50%) scale(1.4); /* Increased scale effect */
+            }
         }
         
         .piano-container {
@@ -457,9 +464,50 @@
         .emergency-toggle:hover {
             background: #ff3300;
         }
+        
+        /* GitHub icon styling */
+        .github-icon {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            width: 32px;
+            height: 32px;
+            z-index: 9999;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 3px rgba(0,0,0,0.3));
+        }
+        
+        .github-icon svg {
+            width: 100%;
+            height: 100%;
+            fill: white;
+        }
+        
+        .github-icon:hover {
+            transform: scale(1.15) rotate(5deg);
+            filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
+        }
+        
+        /* Make icon touch-friendly for mobile */
+        @media (max-width: 768px) {
+            .github-icon {
+                width: 40px;
+                height: 40px;
+                top: 10px;
+                right: 10px;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- GitHub link -->
+    <a href="https://github.com/Saganaki22/EZPiano" target="_blank" rel="noopener noreferrer" class="github-icon" aria-label="View source on GitHub">
+        <svg viewBox="0 0 16 16" version="1.1" aria-hidden="true">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+        </svg>
+    </a>
+    
     <div class="piano-wrapper" id="piano-wrapper">
         <div class="wrapper">
             <header>
@@ -1218,7 +1266,7 @@
                             learnModeTimeout = setTimeout(() => {
                                 currentLearnStep++;
                                 showNextKeyIndicator();
-                            }, 800);
+                            }, 300); // Reduced from 800ms to 300ms for faster response
                         } else if (ignoreWrongKeys) {
                             // If we're ignoring wrong keys in learn mode, do nothing
                             return;
@@ -1500,7 +1548,7 @@
                     if (indicator && indicator.parentNode) {
                         indicator.remove();
                     }
-                }, 800);
+                }, 300); // Reduced from 800ms to 300ms for faster feedback
             }
             
             // Toggle Learn Mode
@@ -2321,7 +2369,7 @@
                                 learnModeTimeout = setTimeout(() => {
                                     currentLearnStep++;
                                     showNextKeyIndicator();
-                                }, 800);
+                                }, 300); // Reduced from 800ms to 300ms for faster response
                             } else if (!ignoreWrongKeys) {
                                 // Play any key in non-strict mode
                                 playNote(keyData);
@@ -2367,7 +2415,7 @@
                                 learnModeTimeout = setTimeout(() => {
                                     currentLearnStep++;
                                     showNextKeyIndicator();
-                                }, 800);
+                                }, 300); // Reduced from 800ms to 300ms for faster response
                             } else if (!ignoreWrongKeys) {
                                 // Play any key in non-strict mode
                                 playNote(keyData);
@@ -2641,8 +2689,6 @@
     </script>
 </body>
 
-<!-- Key toggle functionality removed - keys are now always visible -->
-<!-- Add this style at the very end to ensure it overrides everything -->
 <script>
     // FINAL SETUP - SHOW KEYS PERMANENTLY
     document.addEventListener("DOMContentLoaded", function() {
