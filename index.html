@@ -1,0 +1,2657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EZ Piano | Interactive Virtual Piano</title>
+    <meta name="description" content="An interactive virtual piano with learning mode and classic songs like Fur Elise, Turkish March, and Amazing Grace. Experience playing piano with authentic sound and easy controls.">
+  
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon/android-chrome-512x512.png">
+    <link rel="manifest" href="/favicon/webmanifest.json">
+    <meta name="theme-color" content="#c9e9ff">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="EZ Piano | Interactive Virtual Piano">
+    <meta property="og:description" content="An interactive virtual piano with learning mode and classic songs like Fur Elise, Turkish March, and Amazing Grace. Experience playing piano with authentic sound and easy controls.">
+    <meta property="og:image" content="https://example.com/ezpiano.jpg">
+    <meta property="og:url" content="https://example.com/ezpiano/">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="EZ Piano | Interactive Virtual Piano">
+    <meta name="twitter:description" content="An interactive virtual piano with learning mode, authentic sound, and classic songs. Play Fur Elise, Moonlight Sonata, and more!">
+    <meta name="twitter:image" content="https://example.com/ezpiano.jpg">
+    <style>
+        /* Import Google font - Poppins */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #c9e9ff;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .piano-wrapper {
+            padding: 35px 40px;
+            border-radius: 20px;
+            background: #141414;
+            width: 100%;
+            max-width: 1600px;
+            margin-bottom: 80px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            transform-origin: center top !important;
+            transition: transform 0.3s ease;
+        }
+        
+        .wrapper header {
+            display: flex;
+            color: #FFF;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        header h2 {
+            font-size: 1.6rem;
+        }
+        
+        header .volume-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .volume-container span {
+            font-weight: 500;
+            margin-right: 15px;
+            font-size: 1.19rem;
+        }
+        
+        .volume-slider input {
+            outline: none;
+            accent-color: #fff;
+        }
+        
+        .keys-toggle {
+            display: flex;
+            align-items: center;
+        }
+        
+        .keys-toggle span {
+            margin-right: 10px;
+            color: #FFF;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            border-radius: 15px;
+            background: #4B4B4B;
+            cursor: pointer;
+        }
+        
+        .toggle-switch::before {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #8c8c8c;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-switch.active::before {
+            left: 35px;
+            background: #fff;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            position: relative;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .controls .left-controls,
+        .controls .right-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .controls .center-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .control-button {
+            background: #2D2D2D;
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+            min-width: 80px;
+        }
+        
+        .control-button:hover {
+            background: #3D3D3D;
+        }
+        
+        .control-button.active {
+            background: #4D4D4D;
+        }
+        
+        .display {
+            width: 100%;
+            background: #1E1E1E;
+            color: #eee;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+        
+        .emergency-message {
+            width: 100%;
+            color: #ff6b6b;
+            padding: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+        
+        /* Breathing animations for record and play buttons */
+        @keyframes breatheRed {
+            0%, 100% { background-color: #2D2D2D; }
+            50% { background-color: #AA2222; }
+        }
+        
+        @keyframes breatheGreen {
+            0%, 100% { background-color: #2D2D2D; }
+            50% { background-color: #22AA22; }
+        }
+        
+        .breathing-red {
+            animation: breatheRed 1.5s infinite;
+        }
+        
+        .breathing-green {
+            animation: breatheGreen 1.5s infinite;
+        }
+        
+        /* Now playing song label */
+        .now-playing-label {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1E1E1E;
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 5;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            white-space: nowrap;
+            max-width: 90%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .now-playing-label.visible {
+            opacity: 1;
+        }
+        
+        /* Learn mode styles */
+        .key-indicator {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: none;
+        }
+
+        .next-key-indicator {
+            background-color: #ffcc00;
+            display: block;
+            animation: breatheYellow 1.5s infinite;
+        }
+
+        .correct-key-indicator {
+            background-color: #22cc22;
+            display: block;
+            animation: none;
+        }
+
+        @keyframes breatheYellow {
+            0%, 100% { box-shadow: 0 0 5px 2px rgba(255, 204, 0, 0.4); transform: translateX(-50%) scale(1); }
+            50% { box-shadow: 0 0 10px 3px rgba(255, 204, 0, 0.7); transform: translateX(-50%) scale(1.2); }
+        }
+        
+        .piano-container {
+            position: relative;
+            margin-top: 20px;
+            transition: margin-bottom 0.3s ease;
+        }
+        
+        .piano-keys {
+            display: flex;
+            list-style: none;
+            position: relative;
+        }
+        
+        .piano-keys .key {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            text-transform: uppercase;
+        }
+        
+        .piano-keys .black {
+            z-index: 2;
+            width: 40px;
+            height: 120px;
+            margin: 0 -20px 0 -20px;
+            border-radius: 0 0 5px 5px;
+            background: linear-gradient(#333, #000);
+        }
+        
+        .piano-keys .black.active {
+            box-shadow: inset -5px -10px 10px rgba(255,255,255,0.1);
+            background:linear-gradient(to bottom, #000, #434343);
+        }
+        
+        .piano-keys .white {
+            height: 200px;
+            width: 60px;
+            border-radius: 8px;
+            border: 1px solid #000;
+            background: linear-gradient(#fff 96%, #eee 4%);
+        }
+        
+        .piano-keys .white.active {
+            box-shadow: inset -5px 5px 20px rgba(0,0,0,0.2);
+            background:linear-gradient(to bottom, #fff 0%, #eee 100%);
+        }
+        
+        .piano-keys .key.playing {
+            outline: 3px solid #2ecc71;
+            box-shadow: 0 0 10px #2ecc71;
+            z-index: 3;
+        }
+        
+        .piano-keys .key span {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            color: #A2A2A2;
+            font-size: 1.13rem;
+            text-align: center;
+        }
+        
+        .piano-keys .black span {
+            bottom: 13px;
+            color: #888888;
+        }
+        
+        .piano-keys .key.hide span {
+            display: none;
+        }
+        
+        /* Song dropdown menu */
+        .song-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .song-dropdown-content {
+            display: none;
+            position: absolute;
+            background: #2D2D2D;
+            min-width: 200px;
+            border-radius: 5px;
+            z-index: 10;
+            left: 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .song-dropdown:hover .song-dropdown-content {
+            display: block;
+        }
+        
+        .song-dropdown-content a {
+            color: #fff;
+            padding: 10px;
+            text-decoration: none;
+            display: block;
+            transition: background 0.2s;
+        }
+        
+        .song-dropdown-content a:hover {
+            background: #3D3D3D;
+        }
+        
+        /* Footer with piano scaling */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #1E1E1E;
+            padding: 15px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 1000;
+        }
+        
+        .scale-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .scale-container span {
+            font-size: 0.9rem;
+        }
+        
+        .scale-slider {
+            flex-grow: 1;
+        }
+        
+        .scale-slider input {
+            width: 100%;
+            accent-color: #fff;
+        }
+        
+        /* Media query for small screens */
+        @media screen and (max-width: 815px) {
+            .piano-wrapper {
+                padding: 25px;
+            }
+            
+            .controls {
+                justify-content: center;
+            }
+            
+            .control-button {
+                min-width: 60px;
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+            
+            .piano-keys .white {
+                width: 40px;
+            }
+            
+            .piano-keys .black {
+                width: 30px;
+                margin: 0 -15px 0 -15px;
+            }
+        }
+        
+        /* This style will be toggled on/off via JavaScript to force key visibility regardless of other CSS */
+        .force-show-keys .piano-keys .key span {
+            display: block !important;
+        }
+        
+        .force-hide-keys .piano-keys .key span {
+            display: none !important;
+        }
+        
+        /* Emergency button style */
+        .emergency-toggle {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #ff5500;
+            color: white;
+            border: 3px solid black;
+            padding: 10px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 9999;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        
+        .emergency-toggle:hover {
+            background: #ff3300;
+        }
+    </style>
+</head>
+<body>
+    <div class="piano-wrapper" id="piano-wrapper">
+        <div class="wrapper">
+            <header>
+                <h2>EZ Piano</h2>
+                <div class="volume-container">
+                    <span>Volume</span>
+                    <div class="volume-slider">
+                        <input type="range" min="0" max="1" value="0.5" step="any" id="volume-slider">
+                    </div>
+                </div>
+                <!-- Show Keys toggle removed -->
+            </header>
+            
+            <div class="controls">
+                <div class="left-controls">
+                    <button class="control-button" id="sustain-btn">Sustain</button>
+                    <button class="control-button" id="sound-btn">Piano</button>
+                </div>
+                <div class="center-controls">
+                    <div class="now-playing-label" id="now-playing-label">Now Playing: Song Name</div>
+                    <div class="song-dropdown">
+                        <button class="control-button" id="play-song-btn">Play Song ▼</button>
+                        <div class="song-dropdown-content">
+                            <a href="#" data-song="fur-elise">Fur Elise</a>
+                            <a href="#" data-song="greensleeves">Greensleeves</a>
+                            <a href="#" data-song="gymnopedie">Gymnopedie No.1</a>
+                            <a href="#" data-song="ode-to-joy">Ode to Joy</a>
+                            <a href="#" data-song="nocturne">Nocturne Op.9 No.2</a>
+                            <a href="#" data-song="amazing-grace">Amazing Grace</a>
+                            <a href="#" data-song="moonlight">Moonlight Sonata</a>
+                            <a href="#" data-song="happy-birthday">Happy Birthday</a>
+                            <a href="#" data-song="twinkle-twinkle">Twinkle Twinkle Little Star</a>
+                            <a href="#" data-song="lacrimosa">Lacrimosa</a>
+                            <a href="#" data-song="minuet">Minuet in G</a>
+                            <a href="#" data-song="turkish-march">Mozart's Turkish March</a>
+                            <!-- Video game themes -->
+                            <a href="#" data-song="pokemon">Pokemon Theme</a>
+                            <a href="#" data-song="mario">Super Mario Theme</a>
+                            <a href="#" data-song="tetris">Tetris Theme</a>
+                            <a href="#" data-song="rickroll">Never Gonna Give You Up</a>
+                            <!-- Classical virtuoso pieces -->
+                            <a href="#" data-song="bumblebee">Flight of the Bumblebee</a>
+                        </div>
+                    </div>
+                    <button class="control-button" id="learn-btn">Learn</button>
+                    <button class="control-button" id="stop-btn">Stop</button>
+                </div>
+                <div class="right-controls">
+                    <button class="control-button" id="rec-btn">REC</button>
+                    <button class="control-button" id="play-btn">PLAY</button>
+                </div>
+            </div>
+            
+            <div class="display">C4</div>
+            
+            <div class="piano-container" id="piano-container">
+                <ul class="piano-keys">
+                    <!-- Lower octave -->
+                    <li class="key white" data-key="z" data-note="C2"><span>z</span></li>
+                    <li class="key black" data-key="q" data-note="C#2"><span>q</span></li>
+                    <li class="key white" data-key="x" data-note="D2"><span>x</span></li>
+                    <li class="key black" data-key="2" data-note="D#2"><span>2</span></li>
+                    <li class="key white" data-key="c" data-note="E2"><span>c</span></li>
+                    <li class="key white" data-key="v" data-note="F2"><span>v</span></li>
+                    <li class="key black" data-key="3" data-note="F#2"><span>3</span></li>
+                    <li class="key white" data-key="b" data-note="G2"><span>b</span></li>
+                    <li class="key black" data-key="4" data-note="G#2"><span>4</span></li>
+                    <li class="key white" data-key="n" data-note="A2"><span>n</span></li>
+                    <li class="key black" data-key="5" data-note="A#2"><span>5</span></li>
+                    <li class="key white" data-key="m" data-note="B2"><span>m</span></li>
+                    
+                    <!-- Middle octave -->
+                    <li class="key white" data-key="," data-note="C3"><span>,</span></li>
+                    <li class="key black" data-key="6" data-note="C#3"><span>6</span></li>
+                    <li class="key white" data-key="." data-note="D3"><span>.</span></li>
+                    <li class="key black" data-key="7" data-note="D#3"><span>7</span></li>
+                    <li class="key white" data-key="/" data-note="E3"><span>/</span></li>
+                    <li class="key white" data-key="]" data-note="F3"><span>]</span></li>
+                    <li class="key black" data-key="8" data-note="F#3"><span>8</span></li>
+                    <li class="key white" data-key="a" data-note="G3"><span>a</span></li>
+                    <li class="key black" data-key="9" data-note="G#3"><span>9</span></li>
+                    <li class="key white" data-key="s" data-note="A3"><span>s</span></li>
+                    <li class="key black" data-key="0" data-note="A#3"><span>0</span></li>
+                    <li class="key white" data-key="d" data-note="B3"><span>d</span></li>
+                    
+                    <!-- Upper octave -->
+                    <li class="key white" data-key="f" data-note="C4"><span>f</span></li>
+                    <li class="key black" data-key="-" data-note="C#4"><span>-</span></li>
+                    <li class="key white" data-key="g" data-note="D4"><span>g</span></li>
+                    <li class="key black" data-key="=" data-note="D#4"><span>=</span></li>
+                    <li class="key white" data-key="h" data-note="E4"><span>h</span></li>
+                    <li class="key white" data-key="j" data-note="F4"><span>j</span></li>
+                    <li class="key black" data-key="w" data-note="F#4"><span>w</span></li>
+                    <li class="key white" data-key="k" data-note="G4"><span>k</span></li>
+                    <li class="key black" data-key="e" data-note="G#4"><span>e</span></li>
+                    <li class="key white" data-key="l" data-note="A4"><span>l</span></li>
+                    <li class="key black" data-key="r" data-note="A#4"><span>r</span></li>
+                    <li class="key white" data-key=";" data-note="B4"><span>;</span></li>
+                    
+                    <!-- Highest octave for extension -->
+                    <li class="key white" data-key="'" data-note="C5"><span>'</span></li>
+                    <li class="key black" data-key="t" data-note="C#5"><span>t</span></li>
+                    <li class="key white" data-key="Enter" data-note="D5"><span>↵</span></li>
+                    <li class="key black" data-key="y" data-note="D#5"><span>y</span></li>
+                    <li class="key white" data-key="i" data-note="E5"><span>i</span></li>
+                    <li class="key white" data-key="o" data-note="F5"><span>o</span></li>
+                    <li class="key black" data-key="u" data-note="F#5"><span>u</span></li>
+                    <li class="key white" data-key="p" data-note="G5"><span>p</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <div class="scale-container">
+            <span>Piano Size:</span>
+            <div class="scale-slider">
+                <input type="range" min="0.5" max="1.5" value="1" step="0.05" id="scale-slider">
+            </div>
+            <span id="scale-value">100%</span>
+        </div>
+    </div>
+
+    <script>
+        // Initialize audio context when page loads
+        window.addEventListener('load', function() {
+            initializeVirtualPiano();
+        });
+
+        function initializeVirtualPiano() {
+            // Audio context
+            let audioContext = null;
+            let masterGainNode = null;
+            let reverbNode = null;
+            
+            // Track active notes separately for user and song playback
+            const userActiveNotes = {};
+            const songActiveNotes = {};
+            
+            // DOM Elements
+            const pianoKeys = document.querySelectorAll(".piano-keys .key");
+            const volumeSlider = document.querySelector("#volume-slider");
+            const keysToggle = document.getElementById("keys-toggle");
+            const sustainBtn = document.getElementById("sustain-btn");
+            const soundBtn = document.getElementById("sound-btn");
+            const recBtn = document.getElementById("rec-btn");
+            const playBtn = document.getElementById("play-btn");
+            const playSongBtn = document.getElementById("play-song-btn");
+            const stopBtn = document.getElementById("stop-btn");
+            const learnBtn = document.getElementById("learn-btn");
+            const display = document.querySelector(".display");
+            const pianoWrapper = document.getElementById("piano-wrapper");
+            const scaleSlider = document.getElementById("scale-slider");
+            const scaleValue = document.getElementById("scale-value");
+            const nowPlayingLabel = document.getElementById("now-playing-label");
+            
+            // Song related DOM elements
+            const songLinks = document.querySelectorAll(".song-dropdown-content a");
+            
+            // State variables
+            let allKeys = [];
+            let currentSong = "fur-elise"; // Default song - make sure this matches exactly
+            let isSustainOn = false;
+            let soundType = "piano"; // piano, synth, organ
+            let isRecording = false;
+            let recordedNotes = [];
+            let recordStartTime = 0;
+            let songTimeouts = [];
+            let isSongPlaying = false;
+            
+            // Learn mode variables
+            let isLearnModeActive = false;
+            let currentLearnStep = 0;
+            let currentLearnSong = null;
+            let correctKeyIndicators = {};
+            let ignoreWrongKeys = true;
+            let learnModeTimeout = null;
+            
+            // Initialize the audio context
+            function initAudio() {
+                if (audioContext) return; // Already initialized
+                
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    // Create reverb node for piano sound
+                    reverbNode = audioContext.createConvolver();
+                    
+                    // Create a reverb impulse response
+                    createReverbImpulse().then(impulseBuffer => {
+                        reverbNode.buffer = impulseBuffer;
+                        
+                        // Create master gain node
+                        masterGainNode = audioContext.createGain();
+                        
+                        // Connect reverb -> master -> output
+                        reverbNode.connect(masterGainNode);
+                        masterGainNode.connect(audioContext.destination);
+                        
+                        // Set initial volume
+                        masterGainNode.gain.value = volumeSlider.value || 0.5;
+                    }).catch(error => {
+                        console.error("Failed to create reverb:", error);
+                        
+                        // Fallback without reverb if it fails
+                        masterGainNode = audioContext.createGain();
+                        masterGainNode.connect(audioContext.destination);
+                        masterGainNode.gain.value = volumeSlider.value || 0.5;
+                    });
+                    
+                    // Resume audio context if suspended
+                    if (audioContext.state === 'suspended') {
+                        audioContext.resume();
+                    }
+                } catch (e) {
+                    console.error("Error initializing audio:", e);
+                }
+            }
+            
+            // Create a reverb impulse response for more realistic piano sound
+            async function createReverbImpulse() {
+                const duration = 2.5;
+                const decay = 2.0;
+                const sampleRate = audioContext.sampleRate;
+                const length = sampleRate * duration;
+                const impulse = audioContext.createBuffer(2, length, sampleRate);
+                const impulseL = impulse.getChannelData(0);
+                const impulseR = impulse.getChannelData(1);
+                
+                // Generate room impulse response
+                for (let i = 0; i < length; i++) {
+                    const n = i / sampleRate;
+                    const t = (length - i) / length;
+                    
+                    // Exponential decay
+                    const value = (Math.random() * 2 - 1) * Math.pow(t, decay);
+                    
+                    // Stereo spread
+                    impulseL[i] = value * (1 - (i / length) * 0.3);
+                    impulseR[i] = value * (1 - (i / length) * 0.3);
+                }
+                
+                return impulse;
+            }
+            
+            // Make sure audio context is initialized and suspended state is resolved
+            function ensureAudioContext() {
+                if (!audioContext) {
+                    initAudio();
+                }
+                
+                if (audioContext && audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+                
+                // Ensure we have a master gain node even if reverb failed
+                if (!masterGainNode && audioContext) {
+                    masterGainNode = audioContext.createGain();
+                    masterGainNode.connect(audioContext.destination);
+                    masterGainNode.gain.value = volumeSlider.value || 0.5;
+                }
+                
+                return audioContext;
+            }
+            
+            // Expanded note frequencies for full-sized piano
+            const noteFrequencies = {
+                // Low octave (C2-B2)
+                'C2': 65.41,
+                'C#2': 69.30,
+                'D2': 73.42,
+                'D#2': 77.78,
+                'E2': 82.41,
+                'F2': 87.31,
+                'F#2': 92.50,
+                'G2': 98.00,
+                'G#2': 103.83,
+                'A2': 110.00,
+                'A#2': 116.54,
+                'B2': 123.47,
+                
+                // Middle octave (C3-B3)
+                'C3': 130.81,
+                'C#3': 138.59,
+                'D3': 146.83,
+                'D#3': 155.56,
+                'E3': 164.81,
+                'F3': 174.61,
+                'F#3': 185.00,
+                'G3': 196.00,
+                'G#3': 207.65,
+                'A3': 220.00,
+                'A#3': 233.08,
+                'B3': 246.94,
+                
+                // Upper octave (C4-B4)
+                'C4': 261.63,
+                'C#4': 277.18,
+                'D4': 293.66,
+                'D#4': 311.13,
+                'E4': 329.63,
+                'F4': 349.23,
+                'F#4': 369.99,
+                'G4': 392.00,
+                'G#4': 415.30,
+                'A4': 440.00,
+                'A#4': 466.16,
+                'B4': 493.88,
+                
+                // Highest octave (C5-G5)
+                'C5': 523.25,
+                'C#5': 554.37,
+                'D5': 587.33,
+                'D#5': 622.25,
+                'E5': 659.25,
+                'F5': 698.46,
+                'F#5': 739.99,
+                'G5': 783.99
+            };
+            
+            // Create white noise buffer for piano hammer sound
+            function createNoiseBuffer() {
+                const context = ensureAudioContext();
+                if (!context) return null;
+                
+                const bufferSize = context.sampleRate * 0.03; // 30ms noise buffer
+                const buffer = context.createBuffer(1, bufferSize, context.sampleRate);
+                const output = buffer.getChannelData(0);
+                
+                for (let i = 0; i < bufferSize; i++) {
+                    // More complex noise profile for realistic hammer sound
+                    const t = i / bufferSize;
+                    // Fast attack, quick decay
+                    const envelope = t < 0.1 ? t / 0.1 : Math.pow(1 - ((t - 0.1) / 0.9), 2);
+                    output[i] = (Math.random() * 2 - 1) * envelope * 0.5;
+                }
+                
+                return buffer;
+            }
+            
+            // Enhanced piano tone generator for more realistic sound
+            function createPianoSound(frequency, velocity = 0.8) {
+                const context = ensureAudioContext();
+                if (!context) return { start: function(){}, stop: function(){} };
+                
+                // Sound objects will be collected here
+                const soundParts = [];
+                
+                // Track if this sound has been stopped to prevent double stops
+                let isStopped = false;
+                
+                // Create a single main gain node for this sound
+                const mainGain = context.createGain();
+                mainGain.gain.value = 1.0 * velocity;
+                
+                // Simple connection: mainGain -> masterGain (or destination if no master)
+                if (masterGainNode) {
+                    mainGain.connect(masterGainNode);
+                } else {
+                    mainGain.connect(context.destination);
+                }
+                
+                // Sound type configuration - create appropriate oscillators based on sound type
+                switch (soundType) {
+                    case "organ":
+                        // Create multiple harmonic oscillators for rich organ sound
+                        const harmonicRatios = [1, 2, 3, 4, 5, 6, 8];
+                        const harmonicVolumes = [1.0, 0.7, 0.5, 0.3, 0.2, 0.1, 0.05];
+                        
+                        harmonicRatios.forEach((ratio, i) => {
+                            const osc = context.createOscillator();
+                            osc.type = i % 2 === 0 ? 'sine' : 'triangle';  // Alternate sine and triangle
+                            osc.frequency.value = frequency * ratio;
+                            
+                            const gain = context.createGain();
+                            gain.gain.value = 0; // Start silent
+                            
+                            osc.connect(gain);
+                            gain.connect(mainGain);
+                            osc.start();
+                            
+                            // Apply envelope
+                            const now = context.currentTime;
+                            gain.gain.setValueAtTime(0, now);
+                            gain.gain.linearRampToValueAtTime(harmonicVolumes[i] * velocity, now + 0.1);
+                            
+                            soundParts.push({ oscillator: osc, gainNode: gain });
+                        });
+                        break;
+                        
+                    case "synth":
+                        // Main oscillator
+                        const mainOsc = context.createOscillator();
+                        mainOsc.type = "sawtooth";
+                        mainOsc.frequency.value = frequency;
+                        
+                        // Detuned oscillators for chorus effect
+                        const detuneAmounts = [-10, 10, -5, 5];
+                        detuneAmounts.forEach(detune => {
+                            const osc = context.createOscillator();
+                            osc.type = "sawtooth";
+                            osc.frequency.value = frequency;
+                            osc.detune.value = detune; // Slight detuning
+                            
+                            const gain = context.createGain();
+                            gain.gain.value = 0; // Start silent
+                            
+                            osc.connect(gain);
+                            gain.connect(mainGain);
+                            osc.start();
+                            
+                            // Apply envelope
+                            const now = context.currentTime;
+                            gain.gain.setValueAtTime(0, now);
+                            gain.gain.linearRampToValueAtTime(0.15 * velocity, now + 0.05);
+                            
+                            soundParts.push({ oscillator: osc, gainNode: gain });
+                        });
+                        
+                        // Connect main oscillator
+                        const synthGain = context.createGain();
+                        synthGain.gain.value = 0; // Start silent
+                        
+                        mainOsc.connect(synthGain);
+                        synthGain.connect(mainGain); // FIXED: Connect to mainGain, not itself
+                        mainOsc.start();
+                        
+                        // Apply envelope
+                        const now = context.currentTime;
+                        synthGain.gain.setValueAtTime(0, now);
+                        synthGain.gain.linearRampToValueAtTime(0.5 * velocity, now + 0.05);
+                        
+                        soundParts.push({ oscillator: mainOsc, gainNode: synthGain });
+                        
+                        // Add filter for tone shaping
+                        const filter = context.createBiquadFilter();
+                        filter.type = "lowpass";
+                        filter.frequency.value = 1500;
+                        filter.Q.value = 2;
+                        
+                        // Rearrange connections for filter
+                        mainGain.disconnect();
+                        mainGain.connect(filter);
+                        
+                        if (masterGainNode) {
+                            filter.connect(masterGainNode);
+                        } else {
+                            filter.connect(context.destination);
+                        }
+                        
+                        // Filter envelope
+                        filter.frequency.setValueAtTime(1500, now);
+                        filter.frequency.linearRampToValueAtTime(500, now + 2);
+                        break;
+                        
+                    default: // piano - much more realistic now
+                        // Create multiple oscillators for harmonics
+                        const harmonics = [
+                            { ratio: 1.0, type: 'sine', gain: 0.7 },    // Fundamental
+                            { ratio: 2.0, type: 'sine', gain: 0.4 },    // Octave
+                            { ratio: 3.0, type: 'sine', gain: 0.2 },    // 5th over octave
+                            { ratio: 4.0, type: 'sine', gain: 0.1 },    // 2 octaves
+                            { ratio: 5.0, type: 'sine', gain: 0.05 },   // 3rd over 2 octaves
+                            { ratio: 6.0, type: 'sine', gain: 0.025 },  // 5th over 2 octaves
+                        ];
+                        
+                        harmonics.forEach(harmonic => {
+                            const osc = context.createOscillator();
+                            osc.type = harmonic.type;
+                            osc.frequency.value = frequency * harmonic.ratio;
+                            
+                            const gain = context.createGain();
+                            gain.gain.value = 0; // Start silent
+                            
+                            osc.connect(gain);
+                            gain.connect(mainGain);
+                            osc.start();
+                            
+                            // Apply piano-like envelope
+                            const now = context.currentTime;
+                            gain.gain.setValueAtTime(0, now);
+                            // Fast attack
+                            gain.gain.linearRampToValueAtTime(harmonic.gain * velocity, now + 0.01);
+                            // Initial quick decay
+                            gain.gain.setTargetAtTime(harmonic.gain * 0.6 * velocity, now + 0.01, 0.1);
+                            
+                            soundParts.push({ oscillator: osc, gainNode: gain });
+                        });
+                        
+                        // Add piano hammer noise
+                        try {
+                            const noiseBuffer = createNoiseBuffer();
+                            if (noiseBuffer) {
+                                const noiseSource = context.createBufferSource();
+                                noiseSource.buffer = noiseBuffer;
+                                
+                                const noiseGain = context.createGain();
+                                noiseGain.gain.value = 0.15 * velocity; // Subtle noise
+                                
+                                // Bandpass filter to make the noise more "felt-like"
+                                const noiseFilter = context.createBiquadFilter();
+                                noiseFilter.type = "bandpass";
+                                noiseFilter.frequency.value = frequency * 2; // Higher than the note
+                                noiseFilter.Q.value = 1.0;
+                                
+                                noiseSource.connect(noiseFilter);
+                                noiseFilter.connect(noiseGain);
+                                noiseGain.connect(mainGain);
+                                
+                                noiseSource.start();
+                                noiseSource.stop(context.currentTime + 0.03); // Short noise burst
+                            }
+                        } catch (e) {
+                            console.error("Error creating noise:", e);
+                            // Ignore noise errors, it's not essential
+                        }
+                        
+                        // Add a bit of string resonance simulation
+                        try {
+                            // Create a resonant filter
+                            const resonator = context.createBiquadFilter();
+                            resonator.type = "bandpass";
+                            resonator.frequency.value = frequency;
+                            resonator.Q.value = 20; // Very resonant
+                            
+                            const resonatorGain = context.createGain();
+                            resonatorGain.gain.value = 0.05 * velocity;
+                            
+                            // Create noise to excite the filter
+                            const exciter = context.createBufferSource();
+                            const noiseBuffer = createNoiseBuffer();
+                            if (noiseBuffer) {
+                                exciter.buffer = noiseBuffer;
+                                
+                                exciter.connect(resonator);
+                                resonator.connect(resonatorGain);
+                                resonatorGain.connect(mainGain);
+                                
+                                exciter.start();
+                                exciter.stop(context.currentTime + 0.1);
+                            }
+                        } catch (e) {
+                            // Ignore errors for this subtle effect
+                        }
+                        break;
+                }
+                
+                return {
+                    start: function() {
+                        // Already started in the constructor
+                    },
+                    stop: function(releaseTime = 0) {
+                        if (isStopped) return; // Prevent multiple stops
+                        isStopped = true;
+                        
+                        try {
+                            // Immediately disconnect the main gain node - this stops all sound immediately
+                            const now = context.currentTime;
+                            
+                            if (releaseTime <= 0) {
+                                // Instant release - no fade
+                                mainGain.gain.setValueAtTime(0, now);
+                                
+                                // Force disconnect main gain
+                                        setTimeout(() => {
+                                            try {
+                                        mainGain.disconnect();
+                                            } catch (e) { /* Ignore errors */ }
+                                }, 1);
+                                
+                                // Force stop all oscillators
+                                soundParts.forEach(part => {
+                                    try {
+                                        if (part.oscillator) {
+                                            part.oscillator.stop(now);
+                                            part.oscillator.disconnect();
+                                        }
+                                        if (part.gainNode) {
+                                            part.gainNode.disconnect();
+                                    }
+                                    } catch (e) { /* Ignore errors */ }
+                                });
+                            } else {
+                                // Smooth release for sustain mode
+                                mainGain.gain.setValueAtTime(mainGain.gain.value, now);
+                                mainGain.gain.linearRampToValueAtTime(0, now + releaseTime);
+                                
+                                // Stop oscillators after release time
+                                setTimeout(() => {
+                            soundParts.forEach(part => {
+                                try {
+                                            if (part.oscillator) {
+                                            part.oscillator.stop();
+                                            part.oscillator.disconnect();
+                                            }
+                                            if (part.gainNode) {
+                                        part.gainNode.disconnect();
+                                            }
+                                        } catch (e) { /* Ignore errors */ }
+                                    });
+                                    
+                                    // Disconnect main gain
+                                    try {
+                                        mainGain.disconnect();
+                                    } catch (e) { /* Ignore errors */ }
+                                }, releaseTime * 1000 + 10);
+                            }
+                            
+                            // Clear references
+                            soundParts.length = 0;
+                        } catch (e) {
+                            console.error("Error stopping sound:", e);
+                            
+                            // Emergency cleanup
+                            try {
+                                mainGain.disconnect();
+                                soundParts.forEach(part => {
+                                    if (part.oscillator) part.oscillator.disconnect();
+                                    if (part.gainNode) part.gainNode.disconnect();
+                                });
+                                soundParts.length = 0;
+                            } catch (e) { /* Final attempt, ignore errors */ }
+                        }
+                    }
+                };
+            }
+            
+            // Play a note when a key is pressed
+            function playNote(key, isFromSong = false, velocity = 0.8) {
+                // Initialize audio first if not already done
+                initAudio();
+                
+                const keyElement = document.querySelector(`[data-key="${key}"]`);
+                if (!keyElement) {
+                    console.warn(`Cannot find key element for key: ${key}`);
+                    return;
+                }
+                
+                const note = keyElement.dataset.note;
+                display.textContent = note;
+                
+                // Stop any existing sounds for this key first to prevent stacking
+                if (userActiveNotes[key]?.length || songActiveNotes[key]?.length) {
+                    releaseNote(key, isFromSong);
+                }
+                
+                // Apply the right visual class based on source
+                if (isFromSong) {
+                    keyElement.classList.add("playing");
+                } else {
+                    keyElement.classList.add("active");
+                }
+                
+                // Create the sound with specified velocity
+                const sound = createPianoSound(noteFrequencies[note], velocity);
+                
+                // Store the note in the appropriate collection
+                if (isFromSong) {
+                    // Ensure the array exists
+                    if (!songActiveNotes[key]) {
+                        songActiveNotes[key] = [];
+                    }
+                    songActiveNotes[key] = [sound]; // Replace any existing sounds
+                } else {
+                    // Ensure the array exists
+                    if (!userActiveNotes[key]) {
+                        userActiveNotes[key] = [];
+                    }
+                    userActiveNotes[key] = [sound]; // Replace any existing sounds
+                    
+                    // Record the note if we're recording
+                    if (isRecording) {
+                        const currentTime = Date.now() - recordStartTime;
+                        recordedNotes.push({
+                            key: key,
+                            startTime: currentTime,
+                            velocity: velocity
+                        });
+                    }
+                }
+            }
+            
+            // Release a note when a key is released
+            function releaseNote(key, isFromSong = false) {
+                const keyElement = document.querySelector(`[data-key="${key}"]`);
+                if (!keyElement) return;
+                
+                // Immediately remove visual indicators - no delay here
+                if (isFromSong) {
+                    keyElement.classList.remove("playing");
+                } else {
+                    keyElement.classList.remove("active");
+                }
+                
+                // Get the right collection of notes
+                const notesCollection = isFromSong ? songActiveNotes : userActiveNotes;
+                
+                // Check if there are active notes for this key
+                if (notesCollection[key]?.length) {
+                    // Set release duration - use 0 for non-sustain mode for immediate release
+                    const releaseDuration = isSustainOn ? 0.2 : 0;
+                    
+                    try {
+                        // Release all sounds for this key
+                        notesCollection[key].forEach(sound => {
+                            if (sound && typeof sound.stop === 'function') {
+                                sound.stop(releaseDuration);
+                            }
+                        });
+                        
+                        // Immediately clear the reference - this is critical
+                        delete notesCollection[key];
+                    
+                    // Record the note release if recording
+                        if (!isFromSong && isRecording) {
+                        const currentTime = Date.now() - recordStartTime;
+                        // Find the most recent note for this key without an end time
+                        for (let i = recordedNotes.length - 1; i >= 0; i--) {
+                            if (recordedNotes[i].key === key && !recordedNotes[i].endTime) {
+                                recordedNotes[i].endTime = currentTime;
+                                break;
+                            }
+                        }
+                    }
+                            } catch (e) {
+                        // Failsafe - make sure we clear the reference even if there's an error
+                        console.error("Error in releaseNote:", e);
+                        delete notesCollection[key];
+                    }
+                }
+            }
+            
+            // Handle keyboard press with improved event handling
+            function handleKeyDown(e) {
+                // Prevent repeat events when holding key
+                if (e.repeat) return;
+                
+                // Check if we're in learn mode and handle accordingly
+                if (isLearnModeActive && allKeys.includes(e.key)) {
+                    // Check if this is the correct key for the current step
+                    const currentNote = currentLearnSong[currentLearnStep];
+                    
+                    if (currentNote && currentNote.key) {
+                        // The key is already mapped correctly by the transpose function
+                        if (e.key === currentNote.key) {
+                            // Correct key!
+                            const keyElement = document.querySelector(`[data-key="${e.key}"]`);
+                            
+                            // Play the note
+                            playNote(e.key);
+                            
+                            // Mark this key as correct
+                            markKeyAsCorrect(keyElement);
+                            
+                            // Move to the next step with a slight delay
+                            learnModeTimeout = setTimeout(() => {
+                                currentLearnStep++;
+                                showNextKeyIndicator();
+                            }, 800);
+                        } else if (ignoreWrongKeys) {
+                            // If we're ignoring wrong keys in learn mode, do nothing
+                            return;
+                        } else {
+                            // Wrong key, but we'll still play it for normal mode
+                            playNote(e.key);
+                        }
+                    } else {
+                        // No current note or missing key - just play normally
+                        playNote(e.key);
+                    }
+                } else if (allKeys.includes(e.key)) {
+                    // Normal mode - play any key
+                    playNote(e.key);
+                } else if (e.key === "Escape") {
+                    // Emergency stop with ESC key
+                    emergencyStop();
+                } else if (e.key === " ") {
+                    // Emergency stop with space bar for easy access
+                    emergencyStop();
+                    e.preventDefault(); // Prevent scrolling
+                }
+            }
+            
+            // Emergency stop - completely reset the audio system
+            function emergencyStop() {
+                console.log("🚨 EMERGENCY STOP TRIGGERED 🚨");
+                
+                // Save the current sustain state
+                const wasSustainOn = isSustainOn;
+                
+                // Immediately silence all output
+                if (masterGainNode) {
+                    masterGainNode.gain.value = 0;
+                }
+                
+                // Reset UI - remove all active/playing classes
+                document.querySelectorAll(".piano-keys .key.active, .piano-keys .key.playing").forEach(key => {
+                    key.classList.remove("active");
+                    key.classList.remove("playing");
+                });
+                
+                // Clear all timeouts
+                songTimeouts.forEach(timeout => clearTimeout(timeout));
+                songTimeouts = [];
+                
+                // Reset all state
+                isSongPlaying = false;
+                playSongBtn.classList.remove("active", "breathing-green");
+                playSongBtn.textContent = "Play Song ▼";
+                playBtn.classList.remove("active", "breathing-green");
+                playBtn.disabled = false;
+                
+                // Don't reset sustain state, restore it to what it was
+                isSustainOn = wasSustainOn;
+                sustainBtn.classList.toggle("active", isSustainOn);
+                sustainBtn.textContent = isSustainOn ? "Sustain ON" : "Sustain";
+                
+                // Hide the now playing label
+                nowPlayingLabel.classList.remove('visible');
+                
+                // Completely rebuild audio system
+                initAudio();
+            }
+            
+            // Handle keyboard release
+            function handleKeyUp(e) {
+                if (allKeys.includes(e.key)) {
+                    releaseNote(e.key);
+                }
+            }
+            
+            // Stop all sounds - simplified for efficiency
+            function stopAllSounds() {
+                // Reset UI
+                document.querySelectorAll(".piano-keys .key.active, .piano-keys .key.playing").forEach(key => {
+                    key.classList.remove("active");
+                    key.classList.remove("playing");
+                });
+                
+                // Clear all timeouts
+                songTimeouts.forEach(timeout => clearTimeout(timeout));
+                songTimeouts = [];
+                
+                // Reset all state
+                isSongPlaying = false;
+                playSongBtn.classList.remove("active", "breathing-green");
+                playSongBtn.textContent = "Play Song ▼";
+                playBtn.classList.remove("active", "breathing-green");
+                playBtn.disabled = false;
+                
+                // Hide the now playing label
+                nowPlayingLabel.classList.remove('visible');
+                
+                // Direct approach: Force all notes to stop immediately
+                [userActiveNotes, songActiveNotes].forEach(collection => {
+                    Object.keys(collection).forEach(key => {
+                        const sounds = collection[key];
+                        if (sounds) {
+                            sounds.forEach(sound => {
+                                if (sound && typeof sound.stop === 'function') {
+                                    sound.stop(0); // Immediate stop
+                                }
+                            });
+                        }
+                        delete collection[key];
+                    });
+                });
+                
+                // We don't reset sustain anymore, leave it as is
+                // isSustainOn is preserved
+                
+                // If we still have issues with hanging notes, try a more drastic approach
+                if (masterGainNode) {
+                    // Temporary silence to ensure no sound is heard
+                    const currentValue = masterGainNode.gain.value;
+                    masterGainNode.gain.value = 0;
+                    
+                    // Restore after a short delay
+                    setTimeout(() => {
+                        if (masterGainNode) {
+                            masterGainNode.gain.value = currentValue;
+                        }
+                    }, 50);
+                }
+                
+                // If in learn mode, reset learn mode state
+                if (isLearnModeActive) {
+                    resetLearnMode();
+                }
+            }
+            
+            // Initialize Learn Mode
+            function initializeLearnMode() {
+                if (!currentSong || !songs[currentSong]) {
+                    display.textContent = "Select a song first";
+                    setTimeout(() => {
+                        display.textContent = "C4";
+                    }, 2000);
+                    return false;
+                }
+                
+                // Reset state
+                currentLearnStep = 0;
+                
+                // Get the song data and APPLY THE SAME TRANSPOSITION as the play function
+                let originalSongData = [...songs[currentSong]]; // Make a copy
+                // Use the same transposition function as playSong() to ensure
+                // the keys match exactly between learn mode and play mode
+                currentLearnSong = transposeMelodyToNewKeyboardRange(originalSongData, currentSong);
+                
+                console.log("Learn mode initialized with transposed melody for:", currentSong);
+                console.log("First 5 notes:", currentLearnSong.slice(0, 5).map(n => n.note));
+                
+                // Clear any existing indicators
+                clearLearnModeIndicators();
+                
+                // Reset correct key indicators
+                correctKeyIndicators = {};
+                
+                return true;
+            }
+            
+            // Clear all learn mode indicators
+            function clearLearnModeIndicators() {
+                document.querySelectorAll('.key-indicator').forEach(indicator => {
+                    indicator.remove();
+                });
+            }
+            
+            // Reset Learn Mode completely
+            function resetLearnMode() {
+                clearLearnModeIndicators();
+                correctKeyIndicators = {};
+                currentLearnStep = 0;
+                currentLearnSong = null;
+                
+                if (learnModeTimeout) {
+                    clearTimeout(learnModeTimeout);
+                    learnModeTimeout = null;
+                }
+            }
+            
+            // Show indicator for the next key to press
+            function showNextKeyIndicator() {
+                // Clear any existing indicators, not just "next key" indicators
+                clearLearnModeIndicators();
+                
+                // If we've reached the end of the song
+                if (currentLearnStep >= currentLearnSong.length) {
+                    display.textContent = "Song complete!";
+                    
+                    // Flash the display green
+                    display.style.backgroundColor = "#22AA22";
+                    setTimeout(() => {
+                        display.style.backgroundColor = "#1E1E1E";
+                        display.textContent = "C4";
+                    }, 2000);
+                    
+                    // Turn off learn mode
+                    toggleLearnMode();
+                    return;
+                }
+                
+                // Skip rest/pause notes
+                while (currentLearnStep < currentLearnSong.length && 
+                      (currentLearnSong[currentLearnStep].note === 'rest' || 
+                       currentLearnSong[currentLearnStep].note === 'pause')) {
+                    currentLearnStep++;
+                }
+                
+                // Check if we've reached the end after skipping rests
+                if (currentLearnStep >= currentLearnSong.length) {
+                    display.textContent = "Song complete!";
+                    
+                    // Flash the display green
+                    display.style.backgroundColor = "#22AA22";
+                    setTimeout(() => {
+                        display.style.backgroundColor = "#1E1E1E";
+                        display.textContent = "C4";
+                    }, 2000);
+                    
+                    // Turn off learn mode
+                    toggleLearnMode();
+                    return;
+                }
+                
+                // Get the current note to learn
+                const currentNote = currentLearnSong[currentLearnStep];
+                
+                // The key should already be mapped correctly by the transpose function
+                const keyToPress = currentNote.key;
+                
+                // If for some reason the key is still missing, skip this note
+                if (!keyToPress) {
+                    console.warn(`Missing key for note: ${currentNote.note} at step ${currentLearnStep}`);
+                    currentLearnStep++;
+                    showNextKeyIndicator(); // Skip this step
+                    return;
+                }
+                
+                // Find the DOM element for this key
+                const keyElement = document.querySelector(`.piano-keys .key[data-key="${keyToPress}"]`);
+                if (!keyElement) {
+                    console.warn(`Cannot find key element for key: ${keyToPress} (note: ${currentNote.note})`);
+                    currentLearnStep++;
+                    showNextKeyIndicator(); // Skip this step
+                    return;
+                }
+                
+                // Display the note name
+                display.textContent = `Play: ${currentNote.note.toUpperCase()}`;
+                
+                // Check if we already have an indicator for this key
+                let indicator = keyElement.querySelector('.key-indicator');
+                if (!indicator) {
+                    // Create a new indicator
+                    indicator = document.createElement('div');
+                    indicator.className = 'key-indicator';
+                    keyElement.appendChild(indicator);
+                }
+                
+                // Apply "next key" styling
+                indicator.classList.add('next-key-indicator');
+            }
+            
+            // Mark a key as correctly pressed
+            function markKeyAsCorrect(keyElement) {
+                // Find the indicator for this key
+                let indicator = keyElement.querySelector('.key-indicator');
+                if (!indicator) return;
+                
+                // Change from yellow to green
+                indicator.classList.remove('next-key-indicator');
+                indicator.classList.add('correct-key-indicator');
+                
+                // Make the green indicator temporary - remove it after a delay
+                setTimeout(() => {
+                    if (indicator && indicator.parentNode) {
+                        indicator.remove();
+                    }
+                }, 800);
+            }
+            
+            // Toggle Learn Mode
+            function toggleLearnMode() {
+                isLearnModeActive = !isLearnModeActive;
+                learnBtn.classList.toggle('active', isLearnModeActive);
+                
+                if (isLearnModeActive) {
+                    // Stop any playing song
+                    stopAllSounds();
+                    
+                    // Initialize learn mode
+                    if (initializeLearnMode()) {
+                        learnBtn.textContent = "Exit Learn";
+                        showNextKeyIndicator();
+                        
+                        // Disable other buttons
+                        playSongBtn.disabled = true;
+                        playBtn.disabled = true;
+                        recBtn.disabled = true;
+                    } else {
+                        // If initialization failed, turn off learn mode
+                        isLearnModeActive = false;
+                        learnBtn.classList.remove('active');
+                    }
+                } else {
+                    // Exit learn mode
+                    learnBtn.textContent = "Learn";
+                    resetLearnMode();
+                    display.textContent = "C4";
+                    
+                    // Re-enable other buttons
+                    playSongBtn.disabled = false;
+                    playBtn.disabled = false;
+                    recBtn.disabled = false;
+                }
+            }
+            
+            // Toggle sustain mode
+            function toggleSustain() {
+                isSustainOn = !isSustainOn;
+                sustainBtn.classList.toggle("active", isSustainOn);
+                sustainBtn.textContent = isSustainOn ? "Sustain ON" : "Sustain";
+                
+                // If turning sustain off, release all currently sustained notes
+                if (!isSustainOn) {
+                    // Force release all sustained notes
+                    Object.keys(userActiveNotes).forEach(key => {
+                        if (userActiveNotes[key]?.length) {
+                            const keyElement = document.querySelector(`[data-key="${key}"]`);
+                            if (keyElement && !keyElement.classList.contains("active")) {
+                                // Only release notes that aren't actively being pressed
+                                releaseNote(key, false);
+                            }
+                        }
+                    });
+                    
+                    Object.keys(songActiveNotes).forEach(key => {
+                        if (songActiveNotes[key]?.length) {
+                            const keyElement = document.querySelector(`[data-key="${key}"]`);
+                            if (keyElement && !keyElement.classList.contains("playing")) {
+                                // Only release notes that aren't actively being played
+                                releaseNote(key, true);
+                            }
+                        }
+                    });
+                }
+            }
+            
+            // Toggle sound type
+            function toggleSound() {
+                const sounds = ["piano", "synth", "organ"];
+                const currentIndex = sounds.indexOf(soundType);
+                soundType = sounds[(currentIndex + 1) % sounds.length];
+                soundBtn.textContent = soundType.charAt(0).toUpperCase() + soundType.slice(1);
+            }
+            
+            // KEY LABEL TOGGLE FUNCTIONS REMOVED
+            
+            // Toggle recording
+            function toggleRecording() {
+                isRecording = !isRecording;
+                
+                if (isRecording) {
+                    recordedNotes = [];
+                    recordStartTime = Date.now();
+                    recBtn.classList.add("active", "breathing-red");
+                } else {
+                    recBtn.classList.remove("active", "breathing-red");
+                }
+            }
+            
+            // Play back recorded notes
+            function playRecording() {
+                if (recordedNotes.length === 0) {
+                    // Flash the button if nothing to play
+                    playBtn.classList.add("active");
+                    setTimeout(() => {
+                        playBtn.classList.remove("active");
+                    }, 300);
+                    return;
+                }
+                
+                // Stop any existing playback first
+                stopAllSounds();
+                
+                playBtn.classList.add("active", "breathing-green");
+                playBtn.disabled = true;
+                
+                // Sort notes by start time
+                const sortedNotes = [...recordedNotes].sort((a, b) => a.startTime - b.startTime);
+                
+                // Schedule each note to play at the right time
+                sortedNotes.forEach(note => {
+                    // Schedule note start
+                    const startTimeoutId = setTimeout(() => {
+                        playNote(note.key, false, note.velocity || 0.8);
+                    }, note.startTime);
+                    songTimeouts.push(startTimeoutId);
+                    
+                    // Schedule note release
+                    if (note.endTime) {
+                        const endTimeoutId = setTimeout(() => {
+                            releaseNote(note.key);
+                        }, note.endTime);
+                        songTimeouts.push(endTimeoutId);
+                    } else {
+                        // Default duration if no end time recorded
+                        const defaultDuration = note.startTime + 500;
+                        const endTimeoutId = setTimeout(() => {
+                            releaseNote(note.key);
+                        }, defaultDuration);
+                        songTimeouts.push(endTimeoutId);
+                    }
+                });
+                
+                // Find the time of the last note off event
+                const lastNoteTime = sortedNotes.reduce((latest, note) => {
+                    const endTime = note.endTime || note.startTime + 500;
+                    return endTime > latest ? endTime : latest;
+                }, 0);
+                
+                // Schedule the end of playback
+                const endTimeoutId = setTimeout(() => {
+                    playBtn.classList.remove("active", "breathing-green");
+                    playBtn.disabled = false;
+                }, lastNoteTime + 100);
+                songTimeouts.push(endTimeoutId);
+            }
+            
+            // Map note names to keyboard keys
+            const noteToKeyMap = {
+                // Low octave (C2-B2)
+                'c2': 'z',
+                'c#2': 'q',
+                'db2': 'q', // Alternative notation
+                'd2': 'x',
+                'd#2': '2',
+                'eb2': '2', // Alternative notation
+                'e2': 'c',
+                'f2': 'v',
+                'f#2': '3',
+                'gb2': '3', // Alternative notation
+                'g2': 'b',
+                'g#2': '4',
+                'ab2': '4', // Alternative notation
+                'a2': 'n',
+                'a#2': '5',
+                'bb2': '5', // Alternative notation
+                'b2': 'm',
+                
+                // Middle octave (C3-B3)
+                'c3': ',',
+                'c#3': '6',
+                'db3': '6', // Alternative notation
+                'd3': '.',
+                'd#3': '7',
+                'eb3': '7', // Alternative notation
+                'e3': '/',
+                'f3': ']',
+                'f#3': '8',
+                'gb3': '8', // Alternative notation
+                'g3': 'a',
+                'g#3': '9',
+                'ab3': '9', // Alternative notation
+                'a3': 's',
+                'a#3': '0',
+                'bb3': '0', // Alternative notation
+                'b3': 'd',
+                
+                // Upper octave (C4-B4)
+                'c4': 'f',
+                'c#4': '-',
+                'db4': '-', // Alternative notation
+                'd4': 'g',
+                'd#4': '=',
+                'eb4': '=', // Alternative notation
+                'e4': 'h',
+                'f4': 'j',
+                'f#4': 'w',
+                'gb4': 'w', // Alternative notation
+                'g4': 'k',
+                'g#4': 'e',
+                'ab4': 'e', // Alternative notation
+                'a4': 'l',
+                'a#4': 'r',
+                'bb4': 'r', // Alternative notation
+                'b4': ';',
+                
+                // Highest octave (C5-G5)
+                'c5': "'",
+                'c#5': 't',
+                'db5': 't', // Alternative notation
+                'd5': 'Enter',
+                'd#5': 'y',
+                'eb5': 'y', // Alternative notation
+                'e5': 'i',
+                'f5': 'o',
+                'f#5': 'u',
+                'gb5': 'u', // Alternative notation
+                'g5': 'p',
+                
+                // Special handling for songs that might use different note formats
+                // Without octave or with different formats
+                'c': ',', // Default to C3
+                'd': '.', // Default to D3
+                'e': '/', // Default to E3
+                'f': ']', // Default to F3
+                'g': 'a', // Default to G3
+                'a': 's', // Default to A3
+                'b': 'd', // Default to B3
+                
+                'c#': '6', // Default to C#3
+                'db': '6', // Default to Db3
+                'd#': '7', // Default to D#3
+                'eb': '7', // Default to Eb3
+                'f#': '8', // Default to F#3
+                'gb': '8', // Default to Gb3
+                'g#': '9', // Default to G#3
+                'ab': '9', // Default to Ab3
+                'a#': '0', // Default to A#3
+                'bb': '0', // Default to Bb3
+                
+                // Special handling for note formats with spaces or other variations
+                'c sharp': '6',
+                'd sharp': '7',
+                'e sharp': ']', // E# is F
+                'f sharp': '8',
+                'g sharp': '9',
+                'a sharp': '0',
+                'b sharp': ',', // B# is C
+                
+                'c flat': 'd', // Cb is B
+                'd flat': '6',
+                'e flat': '7',
+                'f flat': '/', // Fb is E
+                'g flat': '8',
+                'a flat': '9',
+                'b flat': '0',
+                
+                'pause': null, // For rests
+                'rest': null   // Alternative for rests
+            };
+
+            // Function to get a note directly from a song-specific mapping if needed
+            function getSongSpecificNote(songName, noteValue) {
+                // No octave number fix for specific songs
+                if (songName === 'happy-birthday') {
+                    // Direct mapping table for Happy Birthday if needed
+                    const happyBirthdayMap = {
+                        'c': 'c3', 'd': 'd3', 'e': 'e3', 'f': 'f3', 'g': 'g3', 'a': 'a3', 'b': 'b3',
+                        'c#': 'c#3', 'd#': 'd#3', 'e#': 'f3', 'f#': 'f#3', 'g#': 'g#3', 'a#': 'a#3',
+                        'db': 'c#3', 'eb': 'd#3', 'fb': 'e3', 'gb': 'f#3', 'ab': 'g#3', 'bb': 'a#3'
+                    };
+                    
+                    return happyBirthdayMap[noteValue] || noteValue;
+                }
+                
+                if (songName === 'twinkle-twinkle') {
+                    // Direct mapping table for Twinkle Twinkle
+                    const twinkleMap = {
+                        'c': 'c3', 'd': 'd3', 'e': 'e3', 'f': 'f3', 'g': 'g3', 'a': 'a3', 'b': 'b3'
+                    };
+                    
+                    return twinkleMap[noteValue] || noteValue;
+                }
+                
+                if (songName === 'lacrimosa') {
+                    // Direct mapping for Lacrimosa if needed
+                    const lacrimosaMap = {
+                        'd': 'd3', 'e': 'e3', 'f': 'f3', 'g': 'g3', 'a': 'a3', 'bb': 'bb3', 'c': 'c4'
+                    };
+                    
+                    return lacrimosaMap[noteValue] || noteValue;
+                }
+                
+                if (songName === 'minuet') {
+                    // Direct mapping for Minuet if needed
+                    const minuetMap = {
+                        'g': 'g3', 'a': 'a3', 'b': 'b3', 'c': 'c4', 'd': 'd4', 'e': 'e4', 'f#': 'f#4'
+                    };
+                    
+                    return minuetMap[noteValue] || noteValue;
+                }
+                
+                // If no special mapping exists, return the original note
+                return noteValue;
+            }
+            
+            // Scale piano function
+            function scalePiano(value) {
+                // Apply scale transformation with proper origin
+                pianoWrapper.style.transform = `scale(${value})`;
+                pianoWrapper.style.transformOrigin = "center top"; // Ensure scaling from center top
+                
+                // Calculate the scaled height to adjust spacing
+                const scaledHeight = Math.max(200 * value, 200); // Minimum height of 200px
+                const margin = (value - 1) * 100; // Adjust margin based on scale
+                
+                // Update container margins to maintain proper spacing
+                document.querySelector('.piano-container').style.marginBottom = `${Math.max(margin, 0)}px`;
+                
+                // Update displayed percentage
+                const percentage = Math.round(value * 100);
+                scaleValue.textContent = `${percentage}%`;
+                
+                // Force layout recalculation
+                pianoWrapper.offsetHeight;
+            }
+            
+            // NEW: Function to transpose melody to fit our keyboard range
+            function transposeMelodyToNewKeyboardRange(melody, songName) {
+                if (!melody || !Array.isArray(melody)) {
+                    return melody;
+                }
+                
+                console.log(`Starting transposition for song: ${songName} with ${melody.length} notes`);
+                
+                // Define our new range limits
+                const MIN_NOTE = 'C2';
+                const MAX_NOTE = 'G5';
+                
+                // Create a deep copy of the melody to avoid modifying the original
+                const transposedMelody = JSON.parse(JSON.stringify(melody));
+                
+                // Define a mapping table for notes out of our range
+                const outOfRangeNoteMap = {
+                    // Notes that are too low - map to higher octaves
+                    'a0': 'a2', 'a#0': 'a#2', 'bb0': 'bb2', 'b0': 'b2',
+                    'c1': 'c3', 'c#1': 'c#3', 'db1': 'db3', 'd1': 'd3', 'd#1': 'd#3', 'eb1': 'eb3',
+                    'e1': 'e3', 'f1': 'f3', 'f#1': 'f#3', 'gb1': 'gb3', 'g1': 'g3', 'g#1': 'g#3', 'ab1': 'ab3',
+                    'a1': 'a3', 'a#1': 'a#3', 'bb1': 'bb3', 'b1': 'b3',
+                    
+                    // For certain specific song fixes
+                    'c': 'c3', 'd': 'd3', 'e': 'e3', 'f': 'f3', 'g': 'g3', 'a': 'a3', 'b': 'b3',
+                    'c#': 'c#3', 'd#': 'd#3', 'e#': 'f3', 'f#': 'f#3', 'g#': 'g#3', 'a#': 'a#3', 'bb': 'bb3'
+                };
+                
+                // Define key mappings for common notes
+                const keyMappings = {
+                    // Low octave (C2-B2)
+                    'c2': 'z', 'c#2': 'q', 'db2': 'q', 'd2': 'x', 'd#2': '2', 'eb2': '2',
+                    'e2': 'c', 'f2': 'v', 'f#2': '3', 'gb2': '3', 'g2': 'b', 'g#2': '4', 'ab2': '4',
+                    'a2': 'n', 'a#2': '5', 'bb2': '5', 'b2': 'm',
+                    
+                    // Middle octave (C3-B3)
+                    'c3': ',', 'c#3': '6', 'db3': '6', 'd3': '.', 'd#3': '7', 'eb3': '7',
+                    'e3': '/', 'f3': ']', 'f#3': '8', 'gb3': '8', 'g3': 'a', 'g#3': '9', 'ab3': '9',
+                    'a3': 's', 'a#3': '0', 'bb3': '0', 'b3': 'd',
+                    
+                    // Upper octave (C4-B4)
+                    'c4': 'f', 'c#4': '-', 'db4': '-', 'd4': 'g', 'd#4': '=', 'eb4': '=',
+                    'e4': 'h', 'f4': 'j', 'f#4': 'w', 'gb4': 'w', 'g4': 'k', 'g#4': 'e', 'ab4': 'e',
+                    'a4': 'l', 'a#4': 'r', 'bb4': 'r', 'b4': ';',
+                    
+                    // Highest octave (C5-G5)
+                    'c5': "'", 'c#5': 't', 'db5': 't', 'd5': 'Enter', 'd#5': 'y', 'eb5': 'y',
+                    'e5': 'i', 'f5': 'o', 'f#5': 'u', 'gb5': 'u', 'g5': 'p'
+                };
+                
+                // Define song-specific transposition offsets (if we need to shift entire songs)
+                const songTransposeMap = {
+                    'fur-elise': 1,         // Transpose up one octave
+                    'greensleeves': 1,      // Transpose up one octave
+                    'gymnopedie': 1,        // Transpose up one octave
+                    'happy-birthday': 0,    // No transposition needed
+                    'lacrimosa': 0,         // No transposition needed
+                    'minuet': 0,            // No transposition needed
+                    'ode-to-joy': 1,        // Transpose up one octave
+                    'twinkle-twinkle': 0,   // No transposition needed
+                    'nocturne': 1,          // Transpose up one octave
+                    'amazing-grace': 0,     // No transposition needed
+                    'moonlight': 1          // Transpose up one octave
+                };
+                
+                // Get the transpose offset for this song (if any)
+                const transposeOffset = songTransposeMap[songName] || 0;
+                
+                let notesFixed = 0;
+                let notesOutOfRange = 0;
+                let fullDebug = true; // Enable full debugging
+                
+                // Helper function to determine if a note is in our keyboard range
+                function isNoteInRange(note) {
+                    // Strip any octave and just get the base note
+                    const baseNote = note.replace(/[0-9]/g, '').toLowerCase();
+                    
+                    // If it doesn't have an octave, it's not properly formatted
+                    if (baseNote === note) return false;
+                    
+                    // Get the octave number
+                    const octave = parseInt(note.match(/[0-9]+/)[0]);
+                    
+                    // Check if in range
+                    if (octave < 2 || octave > 5) return false;
+                    if (octave === 5 && ['a', 'a#', 'bb', 'b', 'h'].includes(baseNote)) return false;
+                    
+                    return true;
+                }
+                
+                // Helper function to get the key for a note
+                function getKeyForNote(note) {
+                    const normalizedNote = note.toLowerCase().trim();
+                    return keyMappings[normalizedNote] || noteToKeyMap[normalizedNote];
+                }
+                
+                // Process each note in the melody
+                transposedMelody.forEach((noteObj, index) => {
+                    if (!noteObj || !noteObj.note || noteObj.note === 'pause' || noteObj.note === 'rest') {
+                        return; // Skip pauses and invalid notes
+                    }
+                    
+                    // Normalize note name to lowercase
+                    let originalNote = noteObj.note.toLowerCase().trim();
+                    let transposedNote = originalNote;
+                    
+                    // 1. Fix known out-of-range notes using our mapping table
+                    if (outOfRangeNoteMap[originalNote]) {
+                        transposedNote = outOfRangeNoteMap[originalNote];
+                        notesFixed++;
+                        
+                        if (fullDebug) console.log(`[1] Mapped out-of-range note: ${originalNote} -> ${transposedNote}`);
+                    }
+                    // 2. Add octave 3 to notes without octave number
+                    else if (originalNote.length === 1 || 
+                            (originalNote.length === 2 && (originalNote.includes('#') || originalNote.includes('b')))) {
+                        transposedNote = originalNote + '3';
+                        notesFixed++;
+                        
+                        if (fullDebug) console.log(`[2] Added octave to note: ${originalNote} -> ${transposedNote}`);
+                    }
+                    // 3. Fix notes with low octaves
+                    else if (originalNote.match(/[a-g][#b]?[01]$/)) {
+                        // Extract base note and raise it by 2 octaves
+                        const baseNote = originalNote.replace(/[0-9]/g, '');
+                        const oldOctave = parseInt(originalNote.match(/[0-9]+/)[0]);
+                        const newOctave = oldOctave + 2;
+                        transposedNote = baseNote + newOctave;
+                        notesFixed++;
+                        
+                        if (fullDebug) console.log(`[3] Raised low octave note: ${originalNote} -> ${transposedNote}`);
+                    }
+                    
+                    // 4. Apply song-specific transpose offset if needed
+                    if (transposeOffset > 0 && transposedNote.match(/[a-g][#b]?[0-9]$/)) {
+                        const baseNote = transposedNote.replace(/[0-9]/g, '');
+                        const oldOctave = parseInt(transposedNote.match(/[0-9]+/)[0]);
+                        const newOctave = oldOctave + transposeOffset;
+                        
+                        // Only apply if the result stays in range
+                        if (newOctave <= 5) {
+                            const offsetNote = baseNote + newOctave;
+                            
+                            if (fullDebug) console.log(`[4] Applied song transposition: ${transposedNote} -> ${offsetNote}`);
+                            transposedNote = offsetNote;
+                            notesFixed++;
+                        }
+                    }
+                    
+                    // 5. Final sanity check - make sure the note has an octave
+                    if (!transposedNote.match(/[0-9]$/)) {
+                        transposedNote = transposedNote + '3'; // Default to octave 3
+                        notesFixed++;
+                        
+                        if (fullDebug) console.log(`[5] Added missing octave in final check: ${originalNote} -> ${transposedNote}`);
+                    }
+                    
+                    // 6. Make sure our note is in range and has a corresponding key
+                    if (!isNoteInRange(transposedNote) || !getKeyForNote(transposedNote)) {
+                        const baseNote = transposedNote.replace(/[0-9]/g, '').toLowerCase();
+                        
+                        // Find a suitable octave that's in range
+                        let foundValidOctave = false;
+                        for (let octave = 3; octave <= 4; octave++) {
+                            const candidateNote = baseNote + octave;
+                            if (getKeyForNote(candidateNote)) {
+                                transposedNote = candidateNote;
+                                notesFixed++;
+                                foundValidOctave = true;
+                                
+                                if (fullDebug) console.log(`[6] Fixed out-of-range note: ${originalNote} -> ${transposedNote}`);
+                                break;
+                            }
+                        }
+                        
+                        if (!foundValidOctave) {
+                            // Last resort - try finding any key for a similar base note
+                            for (const [mappedNote, key] of Object.entries(keyMappings)) {
+                                if (mappedNote.startsWith(baseNote.charAt(0))) {
+                                    transposedNote = mappedNote;
+                                    notesFixed++;
+                                    foundValidOctave = true;
+                                    
+                                    if (fullDebug) console.log(`[7] Last resort mapping: ${originalNote} -> ${transposedNote}`);
+                                    break;
+                                }
+                            }
+                            
+                            if (!foundValidOctave) {
+                                notesOutOfRange++;
+                                console.warn(`Could not fix note ${originalNote} at index ${index}, no valid mapping found!`);
+                            }
+                        }
+                    }
+                    
+                    // 7. Assign proper key mapping for the note
+                    const keyForTransposedNote = getKeyForNote(transposedNote);
+                    
+                    // Update the note in the melody if it changed
+                    if (transposedNote !== originalNote || !noteObj.key || noteObj.key === 'undefined') {
+                        noteObj.note = transposedNote;
+                        if (keyForTransposedNote) {
+                            noteObj.key = keyForTransposedNote;
+                            if (fullDebug) console.log(`[8] Assigned key mapping: ${transposedNote} -> ${keyForTransposedNote}`);
+                        }
+                    }
+                });
+                
+                console.log(`Song ${songName}: Fixed ${notesFixed} notes, ${notesOutOfRange} notes still out of range`);
+                
+                // Verify that all notes are mappable
+                let allNotesMappable = true;
+                let unmappableNotes = [];
+                
+                transposedMelody.forEach((noteObj, index) => {
+                    if (!noteObj || !noteObj.note || noteObj.note === 'pause' || noteObj.note === 'rest') {
+                        return; // Skip pauses and rests
+                    }
+                    
+                    const noteToCheck = noteObj.note.toLowerCase().trim();
+                    const keyToPlay = getKeyForNote(noteToCheck);
+                    
+                    if (!keyToPlay) {
+                        allNotesMappable = false;
+                        unmappableNotes.push({ index, note: noteToCheck });
+                    } else if (!noteObj.key || noteObj.key === 'undefined') {
+                        // Ensure the key is assigned
+                        noteObj.key = keyToPlay;
+                    }
+                });
+                
+                if (!allNotesMappable) {
+                    console.warn(`Song ${songName} still has ${unmappableNotes.length} unmappable notes after transposition!`);
+                    console.warn(`Unmappable notes:`, unmappableNotes);
+                } else {
+                    console.log(`Song ${songName} successfully transposed! All notes are now mappable.`);
+                }
+                
+                return transposedMelody;
+            }
+            
+            // Play a selected song
+            function playSong(songName) {
+                if (!songName) {
+                    console.error("No song name provided");
+                    alert("Error: No song name provided");
+                    return;
+                }
+                
+                if (isSongPlaying) {
+                    // Stop current song first
+                    stopAllSounds();
+                    return;
+                }
+                
+                // Initialize audio first if not already done
+                initAudio();
+                
+                // Ensure audio is running
+                if (audioContext && audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+                
+                // Select melody from the imported songs object
+                let melody;
+                if (!window.songs) {
+                    console.error("Songs object not loaded");
+                    alert("Error: Songs not loaded. Try refreshing the page.");
+                    return;
+                }
+                
+                if (window.songs[songName]) {
+                    melody = window.songs[songName];
+                    console.log('Melody found:', melody.length, 'notes');
+                    console.log('First 5 notes of original melody:', melody.slice(0, 5));
+                } else {
+                    console.error("Song not found:", songName);
+                    console.error("Available songs:", Object.keys(window.songs));
+                    alert(`Song not found: "${songName}". Available songs: ${Object.keys(window.songs).join(', ')}`);
+                    return;
+                }
+                
+                // Transpose melody to fit our keyboard range
+                melody = transposeMelodyToNewKeyboardRange(melody, songName);
+                console.log('Melody transposed. First 5 notes of transposed melody:', 
+                           melody.slice(0, 5).map(n => n.note));
+                
+                // Set song to playing
+                isSongPlaying = true;
+                currentSong = songName;
+                
+                playSongBtn.classList.add("active", "breathing-green");
+                playSongBtn.textContent = "Playing ♪";
+                
+                // Show the song title in the now playing label
+                // Get the song name from the corresponding link based on data-song attribute
+                const songLink = document.querySelector(`a[data-song="${songName}"]`);
+                if (songLink) {
+                    nowPlayingLabel.textContent = `Now Playing: ${songLink.textContent}`;
+                    nowPlayingLabel.classList.add('visible');
+                } else {
+                    // Fallback to a formatted version of the song ID if link not found
+                    const formattedName = songName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    nowPlayingLabel.textContent = `Now Playing: ${formattedName}`;
+                    nowPlayingLabel.classList.add('visible');
+                }
+                
+                let currentTime = 0;
+                let notesPlayed = 0;
+                let notesSkipped = 0;
+                
+                // Emergency cache for common unmapped notes
+                const emergencyNoteCache = {};
+                
+                // Helper function to find an emergency key for a note
+                function findEmergencyKey(normalizedNote) {
+                    // Check if we've already found an emergency key for this note
+                    if (emergencyNoteCache[normalizedNote]) {
+                        return emergencyNoteCache[normalizedNote];
+                    }
+                    
+                    let emergencyKey = null;
+                    
+                    // Parse the note to get the base and octave
+                    const baseMatch = normalizedNote.match(/([a-g][#b]?)([0-9])?/);
+                    if (!baseMatch) return null;
+                    
+                    const baseNote = baseMatch[1];
+                    const octave = baseMatch[2] ? parseInt(baseMatch[2]) : 3;
+                    
+                    // STRATEGY 1: Try the same note but in a different octave (2-4)
+                    for (let testOctave = 3; testOctave <= 4; testOctave++) {
+                        if (testOctave === octave) continue; // Skip original octave
+                        
+                        const candidateNote = baseNote + testOctave;
+                        if (noteToKeyMap[candidateNote]) {
+                            emergencyKey = noteToKeyMap[candidateNote];
+                            console.log(`🚨 Emergency note substitution (Strategy 1): ${normalizedNote} -> ${candidateNote} (key: ${emergencyKey})`);
+                            break;
+                        }
+                    }
+                    
+                    // STRATEGY 2: Try same octave but different accidental version (e.g., C# instead of Db)
+                    if (!emergencyKey) {
+                        // Convert between sharp and flat if needed
+                        const sharpToFlat = {
+                            'c#': 'db', 'd#': 'eb', 'f#': 'gb', 'g#': 'ab', 'a#': 'bb'
+                        };
+                        
+                        const flatToSharp = {
+                            'db': 'c#', 'eb': 'd#', 'gb': 'f#', 'ab': 'g#', 'bb': 'a#'
+                        };
+                        
+                        let alternateBase = null;
+                        if (sharpToFlat[baseNote]) {
+                            alternateBase = sharpToFlat[baseNote];
+                        } else if (flatToSharp[baseNote]) {
+                            alternateBase = flatToSharp[baseNote];
+                        }
+                        
+                        if (alternateBase) {
+                            const candidateNote = alternateBase + octave;
+                            if (noteToKeyMap[candidateNote]) {
+                                emergencyKey = noteToKeyMap[candidateNote];
+                                console.log(`🚨 Emergency note substitution (Strategy 2): ${normalizedNote} -> ${candidateNote} (key: ${emergencyKey})`);
+                            }
+                        }
+                    }
+                    
+                    // STRATEGY 3: Try any note with the same letter (A-G) in a valid octave
+                    if (!emergencyKey) {
+                        // Get just the letter part (a, b, c, etc.)
+                        const noteLetter = baseNote.charAt(0);
+                        
+                        // Try all combinations with this letter that are in our piano range
+                        for (const [note, key] of Object.entries(noteToKeyMap)) {
+                            if (note.startsWith(noteLetter) && note.match(/[2-5]$/)) {
+                                emergencyKey = key;
+                                console.log(`🚨🚨 Last resort note substitution (Strategy 3): ${normalizedNote} -> ${note} (key: ${emergencyKey})`);
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // STRATEGY 4: If all else fails, just pick a middle key (C4)
+                    if (!emergencyKey) {
+                        emergencyKey = noteToKeyMap['c4']; // Default to middle C
+                        console.log(`🚨🚨🚨 Absolute final resort (Strategy 4): ${normalizedNote} -> c4 (key: ${emergencyKey})`);
+                    }
+                    
+                    // Cache this for future reference
+                    emergencyNoteCache[normalizedNote] = emergencyKey;
+                    return emergencyKey;
+                }
+                
+                // Play each note with proper spacing
+                melody.forEach((item, index) => {
+                    if (!item || !item.note) {
+                        console.warn(`Invalid note at index ${index}:`, item);
+                        notesSkipped++;
+                        return;
+                    }
+                    
+                    if (item.note === 'pause' || item.note === 'rest') {
+                        // Just a pause - no need to schedule anything
+                        currentTime += item.duration || 250;
+                        return;
+                    }
+                    
+                    // Normalize note name
+                    const normalizedNote = item.note.toLowerCase().trim();
+                    
+                    // Get the key to play - either from the item itself or from the map
+                    let keyToPlay = item.key;
+                    
+                    if (!keyToPlay || keyToPlay === 'undefined') {
+                        keyToPlay = noteToKeyMap[normalizedNote];
+                    }
+                    
+                    if (!keyToPlay) {
+                        // Emergency handling - find any suitable key
+                        keyToPlay = findEmergencyKey(normalizedNote);
+                        
+                        if (!keyToPlay) {
+                            // If all else fails, skip the note
+                        notesSkipped++;
+                            console.warn(`Could not play note: "${item.note}" (normalized: "${normalizedNote}") at index ${index} - NO VALID KEY MAPPING FOUND`);
+                        currentTime += item.duration || 250; // Still advance time
+                        return;
+                        }
+                    }
+                    
+                    // Normal case - schedule the note to play
+                    const playTimeoutId = setTimeout(() => {
+                        // Play the note and track it as from the song
+                        playNote(keyToPlay, true, item.velocity || 0.8);
+                    }, currentTime);
+                    songTimeouts.push(playTimeoutId);
+                    
+                    // Schedule when to release the note
+                    // Make sure the release happens BEFORE the next note
+                    const releaseDuration = item.duration - (item.gap || 10);
+                    const releaseTimeoutId = setTimeout(() => {
+                        releaseNote(keyToPlay, true);
+                    }, currentTime + releaseDuration);
+                    songTimeouts.push(releaseTimeoutId);
+                    
+                    // Move time forward for next note scheduling
+                    currentTime += item.duration || 250;
+                    notesPlayed++;
+                });
+                
+                // Schedule the end of the song
+                const endTimeoutId = setTimeout(() => {
+                    isSongPlaying = false;
+                    playSongBtn.classList.remove("active", "breathing-green");
+                    playSongBtn.textContent = "Play Song ▼";
+                    
+                    // Log results
+                        console.log(`Song ${songName} finished: ${notesPlayed} notes played, ${notesSkipped} notes skipped`);
+                }, currentTime + 200);
+                songTimeouts.push(endTimeoutId);
+            }
+            
+            // Add each piano key to the allKeys array and setup event listeners
+            pianoKeys.forEach(key => {
+                const keyData = key.dataset.key;
+                allKeys.push(keyData);
+                
+                // Add mouse events to the key
+                key.addEventListener("mousedown", function() {
+                    initAudio(); // Make sure audio is initialized
+                    
+                    if (isLearnModeActive) {
+                        // Check if this is the correct key in learn mode
+                        const currentNote = currentLearnSong[currentLearnStep];
+                        
+                        if (currentNote && currentNote.key) {
+                            // The key is already mapped correctly by the transpose function
+                            if (keyData === currentNote.key) {
+                                // Correct key!
+                                playNote(keyData);
+                                
+                                // Mark this key as correct
+                                markKeyAsCorrect(key);
+                                
+                                // Move to the next step with a slight delay
+                                learnModeTimeout = setTimeout(() => {
+                                    currentLearnStep++;
+                                    showNextKeyIndicator();
+                                }, 800);
+                            } else if (!ignoreWrongKeys) {
+                                // Play any key in non-strict mode
+                                playNote(keyData);
+                            }
+                        } else {
+                            // No current note or missing key - just play normally
+                            playNote(keyData);
+                        }
+                    } else {
+                        // Normal mode - play any key
+                        playNote(keyData);
+                    }
+                });
+                
+                key.addEventListener("mouseup", function() {
+                    releaseNote(keyData);
+                });
+                
+                key.addEventListener("mouseleave", function() {
+                    // Always release the note when mouse leaves the key, even if it's not visually active
+                    releaseNote(keyData);
+                });
+                
+                // Touch events for mobile devices
+                key.addEventListener("touchstart", function(e) {
+                    e.preventDefault();
+                    initAudio(); // Make sure audio is initialized
+                    
+                    if (isLearnModeActive) {
+                        // Check if this is the correct key in learn mode
+                        const currentNote = currentLearnSong[currentLearnStep];
+                        
+                        if (currentNote && currentNote.key) {
+                            // The key is already mapped correctly by the transpose function
+                            if (keyData === currentNote.key) {
+                                // Correct key!
+                                playNote(keyData);
+                                
+                                // Mark this key as correct
+                                markKeyAsCorrect(key);
+                                
+                                // Move to the next step with a slight delay
+                                learnModeTimeout = setTimeout(() => {
+                                    currentLearnStep++;
+                                    showNextKeyIndicator();
+                                }, 800);
+                            } else if (!ignoreWrongKeys) {
+                                // Play any key in non-strict mode
+                                playNote(keyData);
+                            }
+                        } else {
+                            // No current note or missing key - just play normally
+                            playNote(keyData);
+                        }
+                    } else {
+                        // Normal mode - play any key
+                        playNote(keyData);
+                    }
+                });
+                
+                key.addEventListener("touchend", function() {
+                    releaseNote(keyData);
+                });
+            });
+            
+            // Initialize audio on first user interaction
+            document.body.addEventListener("click", initAudio, { once: true });
+            
+            // Setup global event listeners
+            document.addEventListener("keydown", handleKeyDown);
+            document.addEventListener("keyup", handleKeyUp);
+            
+            // Volume slider
+            volumeSlider.addEventListener("input", function(e) {
+                if (masterGainNode) {
+                    masterGainNode.gain.value = e.target.value;
+                }
+            });
+            
+            // KEYS TOGGLE FUNCTIONALITY REMOVED
+            
+            // Sustain button
+            sustainBtn.addEventListener("click", toggleSustain);
+            
+            // Sound type button
+            soundBtn.addEventListener("click", toggleSound);
+            
+            // Record button
+            recBtn.addEventListener("click", toggleRecording);
+            
+            // Play recording button
+            playBtn.addEventListener("click", playRecording);
+            
+            // Play song button
+            playSongBtn.addEventListener("click", function() {
+                playSong(currentSong);
+            });
+            
+            // Stop button
+            stopBtn.addEventListener("click", stopAllSounds);
+            
+            // Double-click stop button for more aggressive cleanup
+            stopBtn.addEventListener("dblclick", function() {
+                emergencyStop();
+            });
+            
+            // Scale slider
+            scaleSlider.addEventListener("input", function() {
+                scalePiano(this.value);
+            });
+            
+            // Set initial scale
+            scalePiano(scaleSlider.value);
+            
+            // Make sure scale slider works properly on startup
+            setTimeout(() => {
+                // Initialize scale on page load
+                scalePiano(scaleSlider.value);
+                
+                // Make sure scale slider changes get applied
+                scaleSlider.addEventListener("input", function() {
+                    scalePiano(this.value);
+                });
+            }, 100);
+            
+            // Check if songs are loaded correctly after a short delay
+            setTimeout(() => {
+                if (window.songs) {
+                    console.log("Songs loaded successfully on page load:", Object.keys(window.songs));
+                    console.log("First song (fur-elise) available:", window.songs["fur-elise"] ? "YES" : "NO");
+                } else {
+                    console.error("Songs not loaded correctly on page load");
+                }
+            }, 1500);
+            
+            // Song selection links
+            songLinks.forEach(link => {
+                link.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    const songId = this.getAttribute('data-song');
+                    currentSong = songId;
+                    
+                    // Update display with the selected song
+                    display.textContent = `Selected: ${this.textContent}`;
+                    setTimeout(() => {
+                        display.textContent = "C4";
+                    }, 1500);
+                    
+                    // If we're in learn mode, reset and re-initialize with the new song
+                    if (isLearnModeActive) {
+                        resetLearnMode();
+                        if (initializeLearnMode()) {
+                            showNextKeyIndicator();
+                        }
+                    } else {
+                        // Otherwise, just play the song
+                        playSong(songId);
+                    }
+                    
+                    return false;
+                });
+            });
+            
+            // Learn button
+            learnBtn.addEventListener("click", toggleLearnMode);
+            
+            // Make functions available globally
+            window.playNote = playNote;
+            window.releaseNote = releaseNote;
+            window.toggleSustain = toggleSustain;
+            window.toggleSound = toggleSound;
+            window.toggleRecording = toggleRecording;
+            window.playRecording = playRecording;
+            window.playSong = playSong;
+            window.stopAllSounds = stopAllSounds;
+            window.scalePiano = scalePiano;
+        }
+        
+        // Initialize on page load
+        initializeVirtualPiano();
+    </script>
+    
+    <!-- Import songs module -->
+    <script type="module">
+        // Import the songs - must be at the top level
+        import songs from './songs.js';
+        
+        // Immediately try to make songs available to the main script
+        window.songs = songs;
+        
+        // Main initialization function
+        initSongs(songs).catch(handleSongsError);
+        
+        // Main initialization function
+        async function initSongs(songs) {
+            console.log('Songs module imported successfully');
+            
+            if (!songs || Object.keys(songs).length === 0) {
+                throw new Error('Songs object is empty');
+            }
+            
+            // Debug: Log the songs object to console
+            console.log('Songs loaded successfully:', Object.keys(songs).length, 'songs');
+            console.log('Available songs:', Object.keys(songs).join(', '));
+            
+            // Verify a few songs
+            if (songs['fur-elise']) {
+                console.log('Fur Elise loaded with', songs['fur-elise'].length, 'notes');
+                console.log('First few notes:', songs['fur-elise'].slice(0, 3));
+            } else {
+                console.error('Fur Elise not found in imported songs!');
+                throw new Error('Expected songs not found in import');
+            }
+        }
+        
+        // Error handler for song loading issues
+        async function handleSongsError(error) {
+            console.error('Error loading songs from ES module:', error);
+            
+            // Try loading songs via fetch as a fallback
+            await fetchSongsAsFallback();
+        }
+        
+        // Fallback method to load songs if the ES module approach fails
+        async function fetchSongsAsFallback() {
+            try {
+                console.log('Attempting to load songs via fetch as fallback...');
+                
+                // Fetch the songs.js file directly
+                const response = await fetch('./songs.js');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                // Get the content as text
+                const text = await response.text();
+                
+                // Try to extract the songs object from the text
+                // Remove the export statement and evaluate as regular JS
+                const modifiedText = text.replace('export default songs;', 'window.songs = songs;');
+                
+                // Create a script element and execute the code
+                const script = document.createElement('script');
+                script.textContent = modifiedText;
+                document.body.appendChild(script);
+                
+                console.log('Songs loaded via fetch fallback:', window.songs ? Object.keys(window.songs).length : 0, 'songs');
+                
+                // Force a refresh of available songs in the UI
+                setTimeout(() => {
+                    if (window.songs) {
+                        console.log('Fallback loaded these songs:', Object.keys(window.songs).join(', '));
+                    }
+                }, 500);
+                
+            } catch (fetchError) {
+                console.error('Fallback fetch loading also failed:', fetchError);
+                alert('Could not load songs. Please check console for errors and ensure your server is running correctly.');
+                
+                // Final emergency fallback
+                window.songs = {
+                    'fur-elise': [
+                        { note: 'e4', duration: 250, gap: 30, velocity: 0.8 },
+                        { note: 'd#4', duration: 250, gap: 30, velocity: 0.75 },
+                        { note: 'e4', duration: 250, gap: 30, velocity: 0.8 }
+                    ],
+                    'emergency-song': [
+                        { note: 'c4', duration: 250, gap: 30, velocity: 0.8 },
+                        { note: 'd4', duration: 250, gap: 30, velocity: 0.8 },
+                        { note: 'e4', duration: 250, gap: 30, velocity: 0.8 },
+                        { note: 'f4', duration: 250, gap: 30, velocity: 0.8 }
+                    ]
+                };
+                alert('Used emergency fallback songs due to loading errors.');
+            }
+            }
+            
+            // Add a verification check after a short delay
+            setTimeout(() => {
+                if (!window.songs || Object.keys(window.songs).length === 0) {
+                    console.warn('Songs not properly attached to window object. Retrying...');
+                
+                // Try to find songs in the global scope
+                try {
+                    if (typeof songs !== 'undefined') {
+                    window.songs = songs;
+                        console.log('Found songs in global scope and attached to window object');
+                    }
+                } catch (e) { 
+                    console.error('Could not find songs in global scope', e);
+                }
+                
+                    console.log('Retry complete. Songs available:', window.songs ? Object.keys(window.songs).length : 0);
+                    
+                    // Force a reload if still not working
+                    if (!window.songs || Object.keys(window.songs).length === 0) {
+                        console.error('Still no songs available. Trying one more approach...');
+                        // Last resort - define a minimal song directly
+                        window.songs = {
+                            'fur-elise': [
+                                { note: 'e4', duration: 250, gap: 30, velocity: 0.8 },
+                                { note: 'd#4', duration: 250, gap: 30, velocity: 0.75 },
+                                { note: 'e4', duration: 250, gap: 30, velocity: 0.8 }
+                        ],
+                        'emergency-song': [
+                            { note: 'c4', duration: 250, gap: 30, velocity: 0.8 },
+                            { note: 'e4', duration: 250, gap: 30, velocity: 0.8 },
+                            { note: 'g4', duration: 250, gap: 30, velocity: 0.8 },
+                            { note: 'c5', duration: 500, gap: 30, velocity: 0.8 }
+                        ]
+                    };
+                    console.log('Emergency songs defined:', Object.keys(window.songs).join(', '));
+                    alert('Used emergency fallback songs. Limited songs available.');
+                    }
+                }
+            }, 1000);
+    </script>
+</body>
+
+<!-- Key toggle functionality removed - keys are now always visible -->
+<!-- Add this style at the very end to ensure it overrides everything -->
+<script>
+    // FINAL SETUP - SHOW KEYS PERMANENTLY
+    document.addEventListener("DOMContentLoaded", function() {
+        // Always show key labels since toggle was removed
+        document.querySelectorAll(".piano-keys .key span").forEach(span => {
+            span.style.display = "block";
+        });
+        
+        console.log("Key labels are now permanently visible");
+    });
+</script>
+</html>
